@@ -1,0 +1,34 @@
+- id: '1562512040905'
+  alias: Telegram movimiento detectado
+  trigger:
+  - entity_id: binary_sensor.0x00158d00024ee402_occupancy
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - service: shell_command.camera_take_snapshot
+  - delay: 00:00:05
+  - service: notify.telegramdedani
+    alias: ''
+    data:
+      message: Movimiento detectado
+      data:
+        photo:
+        - file: /tmp/snap.jpg
+- id: '1565390515220'
+  alias: toggleAlarm
+  trigger:
+  - entity_id: sensor.0x00158d0002f82ca1_click
+    from: unknown
+    platform: state
+    to: single
+  condition: []
+  action:
+  - service: automation.toggle
+    entity_id: automation.telegram_movimiento_detectado
+  - service: notify.telegramdedani
+    alias: ''
+    data:
+      message: "Alarm is {{states('automation.telegram_movimiento_detectado')}}"
+

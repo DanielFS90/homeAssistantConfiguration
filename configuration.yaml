@@ -1,0 +1,80 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 41.639349
+  longitude: -0.927605
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 243
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Madrid
+  # Customization file
+  customize: !include customize.yaml  
+  whitelist_external_dirs:
+    - /tmp
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Discover some devices automatically
+discovery:
+
+# Sensors
+sensor:
+  # Weather prediction
+  - platform: yr
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+#mqtt
+mqtt:
+  discovery: true
+  discovery_prefix: homeassistant
+  broker: 127.0.0.1
+  port: 1883
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+logger:
+  default: warning
+  logs:
+    homeassistant.components.mqtt: debug
+
+ffmpeg:
+  ffmpeg_bin: /usr/bin/ffmpeg
+  
+camera:
+  - platform: ffmpeg
+    input: -rtsp_transport tcp -i rtsp://stream:bJ2xnahtCgninraelmI@192.168.1.160:554/live/ch00_0
+    name: Camara1
+
+shell_command:
+  camera_take_snapshot: /usr/bin/wget http://admin:drgsrethsfdghs@192.168.1.160/api/snapshot/image -O /tmp/snap.jpg
+    
+tuya:
+  username: !secret tuya_user
+  password: !secret tuya_password
+  country_code: +34
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_apikey
+    allowed_chat_ids:
+      - !secret telegram_chatid
+
+notify:
+  - name: telegramDeDani
+    platform: telegram
+    chat_id: !secret telegram_chatid
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
